@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>vue+bootstrap购物车</title>
+ 
+    <link href="https://cdn.bootcss.com/twitter-bootstrap/4.0.0-alpha.3/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.bootcss.com/vue/2.6.10/vue.min.js"></script> 
+    <script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://cdn.bootcss.com/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+</head>
+<body>
+    <div class="container" id="app" >
+        <div class="panel panel-default" >
+            <div class="panel-heading" style="background-color:cyan;text-align:center">Vue 学院购物车</div>
+            <table class="table table-bordered text-center" v-if="arr.length != 0">
+                <tr>
+                    <th>ID</th>
+                    <th>订单编号</th>
+                    <th>商品名称</th>
+                    <th>单价</th>
+                    <th>数量</th>
+                    <th>小计</th>
+                    <th>操作</th>
+                </tr>
+
+                <tr v-for="(item,index) in arr">
+                    <td>{{index+1}}</td>
+                    <td>{{item.id}}</td>
+                    <td >{{item.name}}</td>
+                    <td>{{item.price}}元</td>
+
+                    <td> 
+                        <div class="input-group">
+                                <span class="input-group-addon" @click="sub(index)">-</span>
+                                <input type="text" v-model="item.amount" class="form-control"/>
+                                <span class="input-group-addon" @click="add(index)">+</span>
+                        </div>
+                    </td>
+                    <td>{{item.amount * item.price}}元</td>
+                    <td><button class="btn btn-danger" data-toggle="modal" data-target="#layer" @click="nowIndex=index">删除</button></td>
+                </tr>
+                <tr >
+                    <td>总购买价格:</td>
+                    <td colspan="5" >{{totalPrice}}元</td>
+                    <td><button class="btn btn-danger" data-toggle="modal" data-target="#layer" @click="nowIndex=-2">清空购物车</button></td>
+                </tr>
+            </table>
+            <div class="alert alert-warning" v-if="arr.length == 0" >您的购物车没有东西了，您开心吗</div>
+        </div>
+
+        <div role="dialog" class="modal fade bs-example-modal-sm" id="layer">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
+                        <h2>温馨提示😆</h2>
+                        <h3 class="modal-title">您确定要删除{{nowIndex < 0?"全部商品":'商品'+arr[nowIndex].name}}吗？？</h3>
+                    </div>
+                    <div class="modal-body text-right">
+                        <button class="btn btn-primary btn-sm" data-dismiss="modal">取消</button>
+                        <button class="btn btn-danger btn-sm" data-dismiss="modal" @click="removeM(nowIndex)">确认</button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    <script type="text/javascript">
+     var vue_s = new Vue({
+
+            el:"#app",
+            data:{
+                totalPrice : 0,
+                nowIndex :-10,
+                arr:[
+                    {"id":"Fn001","name":"iOS","price":100,"amount":1},
+                    {"id":"Fn002","name":"HTML","price":20,"amount":1},
+                    {"id":"Fn003","name":"JS","price":30,"amount":1},
+                    {"id":"Fn004","name":"Vue","price":80,"amount":1}
+                ],message:"",
+            },
+            methods:{
+                removeM:function(index_p){
+                    if(index_p < 0){
+                        // this.arr.splice(0,this.arr.length);
+                        this.arr = [];
+                    }else{
+                        this.arr.splice(index_p,1);
+                    }
+                    this.clac();
+                },
+                add : function(index_p){
+                    this.arr[index_p].amount++;
+                    this.clac();
+                },
+                sub : function (index_p){
+                    
+                    if( this.arr[index_p].amount >= 1){
+                        
+                        this.arr[index_p].amount--;
+                        this.clac();
+                    }else{
+                        if(confirm("您确定删除这件商品吗?")){
+                            this.arr.splice(index_p,1);
+                        }
+                    }
+                },
+                clac:function(){
+                    this.totalPrice = 0;
+                    var count = this.arr.length;
+                    for(var i = 0; i < count;i++){
+                       this.totalPrice += this.arr[i].price * this.arr[i].amount;
+                    }
+                }
+            }
+          
+        });
+        vue_s.clac();
+    </script>
+</body>
+</html>
